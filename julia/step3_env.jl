@@ -18,7 +18,7 @@ function eval_ast(ast, env)
     elseif isa(ast, Array) || isa(ast, Tuple)
         map((x) -> EVAL(x,env), ast)
     elseif isa(ast, Dict)
-        [EVAL(x[1],env) => EVAL(x[2], env) for x=ast]
+        Dict([EVAL(x[1],env) => EVAL(x[2], env) for x=ast])
     else
         ast
     end
@@ -31,7 +31,7 @@ function EVAL(ast, env)
     # apply
     if     :def! == ast[1]
         env_set(env, ast[2], EVAL(ast[3], env))
-    elseif symbol("let*") == ast[1]
+    elseif Symbol("let*") == ast[1]
         let_env = Env(env)
         for i = 1:2:length(ast[2])
             env_set(let_env, ast[2][i], EVAL(ast[2][i+1], let_env))
@@ -71,7 +71,7 @@ while true
             println("Error: $(string(e))")
         end
         bt = catch_backtrace()
-        Base.show_backtrace(STDERR, bt)
+        Base.show_backtrace(stderr, bt)
         println()
     end
 end
