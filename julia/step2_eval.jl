@@ -17,7 +17,7 @@ function eval_ast(ast, env)
     elseif isa(ast, Array) || isa(ast, Tuple)
         map((x) -> EVAL(x,env), ast)
     elseif isa(ast, Dict)
-        [EVAL(x[1],env) => EVAL(x[2], env) for x=ast]
+        Dict([EVAL(x[1],env) => EVAL(x[2], env) for x=ast])
     else
         ast
     end
@@ -59,7 +59,7 @@ while true
             println("Error: $(string(e))")
         end
         bt = catch_backtrace()
-        Base.show_backtrace(STDERR, bt)
+        Base.show_backtrace(stderr, bt)
         println()
     end
 end
