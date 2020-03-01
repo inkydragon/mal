@@ -19,7 +19,7 @@ function eval_ast(ast, env)
     elseif isa(ast, Array) || isa(ast, Tuple)
         map((x) -> EVAL(x,env), ast)
     elseif isa(ast, Dict)
-        [EVAL(x[1],env) => EVAL(x[2], env) for x=ast]
+        Dict([EVAL(x[1],env) => EVAL(x[2], env) for x=ast])
     else
         ast
     end
@@ -32,7 +32,7 @@ function EVAL(ast, env)
     # apply
     if     :def! == ast[1]
         env_set(env, ast[2], EVAL(ast[3], env))
-    elseif symbol("let*") == ast[1]
+    elseif Symbol("let*") == ast[1]
         let_env = Env(env)
         for i = 1:2:length(ast[2])
             env_set(let_env, ast[2][i], EVAL(ast[2][i+1], let_env))
@@ -51,7 +51,7 @@ function EVAL(ast, env)
         else
             EVAL(ast[3], env)
         end
-    elseif symbol("fn*") == ast[1]
+    elseif Symbol("fn*") == ast[1]
         (args...) -> EVAL(ast[3], Env(env, ast[2], Any[args...]))
     else
         el = eval_ast(ast, env)
@@ -68,6 +68,10 @@ end
 # REPL
 repl_env = nothing
 function REP(str)
+    # s = READ(str)
+    # @show s
+    # PRINT(EVAL(s, repl_env))
+    
     return PRINT(EVAL(READ(str), repl_env))
 end
 
@@ -90,7 +94,7 @@ while true
         end
         if !isa(e, StackOverflowError)
             bt = catch_backtrace()
-            Base.show_backtrace(STDERR, bt)
+            Base.show_backtrace(stderr, bt)
         end
         println()
     end
